@@ -9,6 +9,10 @@ canvas.height = window.innerHeight - 100;
 let timer = 0;
 const speed = 5; // 이동 속도 설정
 
+// 배경 이미지 설정
+const backgroundImage = new Image();
+backgroundImage.src = './preview.jpg'; // 배경 이미지 경로 설정
+
 const Main_unit = {
     x: 10,
     y: 200,
@@ -48,6 +52,11 @@ function updatePosition() {
     }
 }
 
+// 배경을 그리는 함수
+function drawBackground() {
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+}
+
 // 프레임 함수
 function frame() {
     requestAnimationFrame(frame);
@@ -55,6 +64,9 @@ function frame() {
 
     // 이전 프레임의 유닛을 지우고 새로운 위치에 그리기
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 배경 그리기
+    drawBackground();
 
     // 캐릭터 위치 업데이트
     updatePosition();
