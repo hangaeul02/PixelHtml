@@ -234,12 +234,10 @@ function saveHighScore(score) {
 function adjustGameOverUI() {
     const scaleFactor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
 
-    // 게임 오버 창 스타일 동적 조정
     rankingsContainer.style.width = `${Math.max(400, scaleFactor * 800)}px`; 
     rankingsContainer.style.padding = `${scaleFactor * 20}px`; 
     rankingsContainer.style.borderRadius = `${scaleFactor * 10}px`; 
 
-    // 제목과 점수 텍스트 크기 동적 조정
     const gameOverTitle = rankingsContainer.querySelector('h2');
     const finalScoreText = rankingsContainer.querySelector('h3:first-of-type');
     const highScoreText = rankingsContainer.querySelector('h3:nth-of-type(2)');
@@ -337,8 +335,8 @@ const ball = {
 
     updateVelocity() {
         const angle = Math.atan2(this.dy, this.dx); 
-        this.dx = Math.cos(angle) * this.speed; // x 방향 속도 재설정
-        this.dy = Math.sin(angle) * this.speed; // y 방향 속도 재설정
+        this.dx = Math.cos(angle) * this.speed;
+        this.dy = Math.sin(angle) * this.speed; 
     },
 
     adjustRadius() {
@@ -346,9 +344,9 @@ const ball = {
     },
 
     setRandomDirection() {
-        const angle = Math.random() * Math.PI * 2; // 랜덤한 각도 (0~2π)
-        this.dx = Math.cos(angle) * this.speed; // x 방향 속도
-        this.dy = Math.sin(angle) * this.speed; // y 방향 속도
+        const angle = Math.random() * Math.PI * 2; 
+        this.dx = Math.cos(angle) * this.speed;
+        this.dy = Math.sin(angle) * this.speed;
     }
 };
 
@@ -369,29 +367,27 @@ function isBallCollidingWithEnemy(ball, enemy) {
 
 // 플레이어
 const player = {
-    x: canvas.width * 0.2, // 초기 위치
-    y: canvas.height * 0.2, // 초기 위치
-    width: 0, // 너비
-    height: 0, // 높이
-    direction: 'right', // 초기 방향 (left or right)
+    x: canvas.width * 0.2, 
+    y: canvas.height * 0.2, 
+    width: 0, 
+    height: 0,
+    direction: 'right', 
     
     draw() {
         const image = this.direction === 'left' ? playerImageLeft : playerImageRight;
-        ctx.drawImage(currentPlayerImage, this.x, this.y, this.width, this.height); // 방향에 따라 이미지 선택
+        ctx.drawImage(currentPlayerImage, this.x, this.y, this.width, this.height); 
     },
 
     update() {
         this.x += this.dx;
         this.y += this.dy;
 
-        // 방향 설정
         if (this.dx < 0) {
             this.direction = 'left';
         } else if (this.dx > 0) {
             this.direction = 'right';
         }
 
-        // 화면 경계 제한
         if (this.x < 0) this.x = 0;
         if (this.y < 0) this.y = 0;
         if (this.x > canvas.width - this.width) this.x = canvas.width - this.width;
@@ -399,11 +395,10 @@ const player = {
     },
 
     resize() {
-        // 플레이어 크기를 캔버스 크기에 비례하여 설정
-        this.width = canvas.width * 0.03; // 캔버스 너비의 5%
-        this.height = canvas.height * 0.09; // 캔버스 높이의 10%
-        this.x = Math.min(this.x, canvas.width - this.width); // 화면 경계 보정
-        this.y = Math.min(this.y, canvas.height - this.height); // 화면 경계 보정
+        this.width = canvas.width * 0.03; 
+        this.height = canvas.height * 0.09; 
+        this.x = Math.min(this.x, canvas.width - this.width); 
+        this.y = Math.min(this.y, canvas.height - this.height); 
     }
 };
 
@@ -694,16 +689,16 @@ function startDash() {
 
     // 슬라이딩 이미지와 크기 변경
     if (dashDirectionX < 0) {
-        currentPlayerImage = slidingImageLeft; // 왼쪽으로 슬라이딩
+        currentPlayerImage = slidingImageLeft; 
     } else if (dashDirectionX > 0) {
-        currentPlayerImage = slidingImageRight; // 오른쪽으로 슬라이딩
+        currentPlayerImage = slidingImageRight; 
     }
 
     // 대쉬 중 플레이어 크기 변경
     const originalWidth = player.width;
     const originalHeight = player.height;
-    player.width *= 1.2; // 가로 크기를 1.2배로
-    player.height *= 0.8; // 세로 크기를 0.8배로
+    player.width *= 1.2;
+    player.height *= 0.8; 
 
     setTimeout(() => {
         console.log("대쉬 종료");
@@ -711,12 +706,11 @@ function startDash() {
         player.dx = 0;
         player.dy = 0;
 
-        // 대쉬가 끝난 후 이미지와 크기 복원
         currentPlayerImage = dashDirectionX < 0 ? playerImageLeft : playerImageRight;
         player.width = originalWidth;
         player.height = originalHeight;
 
-        dashCooldownRemaining = DASH_COOLDOWN; // 쿨타임 설정
+        dashCooldownRemaining = DASH_COOLDOWN; 
         startDashCooldown();
     }, DASH_DURATION);
 }
@@ -728,10 +722,10 @@ function startDash() {
 // 대쉬 쿨타임 함수
 function startDashCooldown() {
     const cooldownInterval = setInterval(() => {
-        dashCooldownRemaining -= 100; // 100ms씩 감소
+        dashCooldownRemaining -= 100; 
         if (dashCooldownRemaining <= 0) {
             clearInterval(cooldownInterval);
-            dashCooldownRemaining = 0; // 쿨타임 종료
+            dashCooldownRemaining = 0; 
         }
     }, 100);
 }
@@ -761,21 +755,19 @@ function drawDashCooldown() {
     const boxHeight = textHeight + padding * 2;
 
     ctx.beginPath();
-    ctx.moveTo(boxX + borderRadius, boxY); // 시작점
-    ctx.lineTo(boxX + boxWidth - borderRadius, boxY); // 위쪽 라인
-    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + borderRadius); // 오른쪽 위 모서리
-    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - borderRadius); // 오른쪽 라인
-    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - borderRadius, boxY + boxHeight); // 오른쪽 아래 모서리
-    ctx.lineTo(boxX + borderRadius, boxY + boxHeight); // 아래쪽 라인
-    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - borderRadius); // 왼쪽 아래 모서리
-    ctx.lineTo(boxX, boxY + borderRadius); // 왼쪽 라인
-    ctx.quadraticCurveTo(boxX, boxY, boxX + borderRadius, boxY); // 왼쪽 위 모서리
+    ctx.moveTo(boxX + borderRadius, boxY); 
+    ctx.lineTo(boxX + boxWidth - borderRadius, boxY);
+    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + borderRadius); 
+    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - borderRadius);
+    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - borderRadius, boxY + boxHeight); 
+    ctx.lineTo(boxX + borderRadius, boxY + boxHeight); 
+    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - borderRadius); 
+    ctx.lineTo(boxX, boxY + borderRadius);
+    ctx.quadraticCurveTo(boxX, boxY, boxX + borderRadius, boxY); 
     ctx.closePath();
 
     ctx.fillStyle = boxColor;
     ctx.fill();
-
-    // 텍스트 그리기
     ctx.fillStyle = textColor;
     ctx.fillText(text, xPosition, yPosition);
 }
@@ -783,9 +775,9 @@ function drawDashCooldown() {
 
 // 점수 표시
 function drawScore() {
-    const fontSize = canvas.height * 0.05; // 폰트 크기
-    const xPosition = canvas.width * 0.02; // X 위치
-    const yPosition = canvas.height * 0.16; // Y 위치
+    const fontSize = canvas.height * 0.05;
+    const xPosition = canvas.width * 0.02; 
+    const yPosition = canvas.height * 0.16; 
 
     const text = `점수: ${score}`;
 
@@ -822,18 +814,15 @@ function drawCooldown() {
         ? '[스페이스] 공격 가능'
         : `쿨타임: ${(cooldownTimeLeft / 1000).toFixed(1)}s`;
 
-    // 텍스트 박스 색상 설정
     const boxColor = canAttack ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 0, 0, 0.5)';
     const textColor = 'white';
 
-    // 텍스트 크기 측정
     ctx.font = `${fontSize}px 'Arial Black', 'Arial Bold', Gadget, sans-serif`;
     const textWidth = ctx.measureText(text).width;
     const textHeight = fontSize;
     const padding = 10; 
     const borderRadius = 10; 
 
-    // 둥근 네모 박스 경로 생성
     const boxX = xPosition - padding;
     const boxY = yPosition - textHeight - padding;
     const boxWidth = textWidth + padding * 2;
@@ -883,21 +872,21 @@ window.addEventListener('resize', () => {
 
 // 애니메이션 루프
 function gameLoop() {
-    if (!gameRunning) return; // 게임이 실행 중이 아닐 경우 루프 중단
+    if (!gameRunning) return; 
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground(); // 배경 그리기
+    drawBackground();
 
     handlePlayerMovement();
     player.update();
     player.draw();
 
-    ball.update(); // 공 업데이트
+    ball.update();
 
-    drawSword(); // 검 애니메이션
+    drawSword(); 
 
     if (Math.random() < 0.02) {
-        spawnEnemy(); // 적 생성
+        spawnEnemy(); 
     }
     updateEnemies();
 
@@ -912,20 +901,18 @@ function gameLoop() {
 
 
 function gameOver() {
-    cancelAnimationFrame(gameLoopId); // 게임 루프 중단
-    clearInterval(scoreInterval); // 점수 증가 중단
-    gameRunning = false; // 게임 상태 변경
+    cancelAnimationFrame(gameLoopId); 
+    clearInterval(scoreInterval); 
+    gameRunning = false; 
 
-    // 점수와 최고 점수 갱신
     saveHighScore(score);
-    finalScoreDisplay.textContent = score; // 최종 점수 표시
+    finalScoreDisplay.textContent = score; 
     const highScore = getHighScore();
     document.getElementById('highScoreDisplay').textContent = `최고 점수: ${highScore}`;
 
-    // 게임 오버 창 표시
     const rankingsContainer = document.getElementById('rankings');
-    rankingsContainer.style.display = 'block'; // 랭킹 창 보이기
-    adjustGameOverUI(); // 랭킹 창 크기 조정
+    rankingsContainer.style.display = 'block'; 
+    adjustGameOverUI(); 
 }
 
 
@@ -952,14 +939,11 @@ function resetGame() {
     clearInterval(scoreInterval);
 }
 
-
-
-
 function startGame() {
-    resizeCanvas(); // 캔버스 크기 조정
-    resetGame(); // 게임 상태 초기화
-    drawBackground(); // 배경 그리기
-    gameRunning = true; // 게임 실행 상태 업데이트
-    gameLoop(); // 게임 루프 실행
+    resizeCanvas(); 
+    resetGame(); 
+    drawBackground(); 
+    gameRunning = true; 
+    gameLoop(); 
 }
 
