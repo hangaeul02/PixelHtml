@@ -105,7 +105,6 @@ window.addEventListener('keyup', (e) => {
     keys[e.key] = false;
 });
 
-// 키 입력 처리
 window.addEventListener('keydown', (e) => {
     if (e.key === 'z' && !isDashing && dashCooldownRemaining <= 0) {
         startDash(); 
@@ -147,7 +146,6 @@ const enemyImageRight = new Image();
 enemyImageRight.src = '몹R.png'; 
 const ENEMY_BASE_SIZE = 100; 
 
-// 플레이어 이미지 로드
 const playerImageLeft = new Image();
 playerImageLeft.src = '플레이어L.png';
 
@@ -160,7 +158,6 @@ slidingImageLeft.src = '슬라이딩L.png';
 const slidingImageRight = new Image();
 slidingImageRight.src = '슬라이딩R.png';
 
-// 현재 플레이어 이미지
 let currentPlayerImage = playerImageRight; 
 
 const ballImage = new Image();
@@ -204,14 +201,9 @@ function adjustScale() {
     const scaleX = canvas.width / 1920;
     const scaleY = canvas.height / 1080;
 
-    // 플레이어 크기 조정
     player.width = PLAYER_SIZE * scaleX;
     player.height = PLAYER_SIZE * scaleY;
-
-    // 공 크기 조정
     ball.radius = Math.min(scaleX, scaleY) * 15;
-
-    // 적 크기 조정
     enemies.forEach(enemy => {
         enemy.width = ENEMY_SIZE * scaleX;
         enemy.height = ENEMY_SIZE * scaleY;
@@ -258,11 +250,10 @@ function adjustGameOverUI() {
     finalScoreText.style.fontSize = `${Math.max(18, scaleFactor * 28)}px`; 
     highScoreText.style.fontSize = `${Math.max(16, scaleFactor * 24)}px`; 
 
-    // 점수 목록 크기 조정
     const rankingList = rankingsContainer.querySelector('#rankingList');
     rankingList.style.fontSize = `${Math.max(14, scaleFactor * 20)}px`; 
 }
-
+const MIN_SPEED = 0.7;
 
 
 // 공 객체
@@ -276,7 +267,6 @@ const ball = {
     bounceCount: 2, 
     speed: Math.min(canvas.width, canvas.height) * 0.002, 
     image: new Image(),
-    color: 'orange',
 
     init() {
         this.image.src = '공 이미지.png';
@@ -294,7 +284,6 @@ const ball = {
         } else {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
             ctx.fill();
             ctx.closePath();
         }
@@ -303,39 +292,40 @@ const ball = {
     update() {
         this.x += this.dx;
         this.y += this.dy;
-
-        if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-            this.dx *= -1;
+    
+        if (this.x - this.radius < 0) {
+            this.x = this.radius; 
+            this.dx = Math.abs(this.dx); 
+            this.handleBounce();
+        } else if (this.x + this.radius > canvas.width) {
+            this.x = canvas.width - this.radius; 
+            this.dx = -Math.abs(this.dx);
             this.handleBounce();
         }
-        if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
-            this.dy *= -1;
+
+        if (this.y - this.radius < 0) {
+            this.y = this.radius; 
+            this.dy = Math.abs(this.dy); 
+            this.handleBounce();
+        } else if (this.y + this.radius > canvas.height) {
+            this.y = canvas.height - this.radius; 
+            this.dy = -Math.abs(this.dy);
             this.handleBounce();
         }
 
-        this.draw();
+        this.draw(); 
     },
 
     handleBounce() {
-        console.log(`바운스 횟수 감소: ${this.bounceCount - 1}`); 
-    
         this.bounceCount = Math.max(this.bounceCount - 1, 0); 
-        console.log(`바운스 횟수 제한 후: ${this.bounceCount}`); 
     
-        if (this.bounceCount > 0) {
-            this.color = 'orange';
-        } else {
-            this.color = 'red';
-        }
-    
-        this.speed *= 0.6; 
+        this.speed = Math.max(this.speed * 0.6, MIN_SPEED);
         this.updateVelocity();
     
-        if (this.bounceCount <= 0) {
+        if (this.bounceCount < 0) {
             gameOver();
         }
     },
-    
 
     setSpeed(newSpeed) {
         this.speed = newSpeed;
@@ -475,15 +465,12 @@ function drawSword() {
     );
 
     if (distanceToBall < ball.radius + 5) {
-        console.log("공이 검에 튕겼습니다!");
-
         const newAngle = Math.atan2(ball.y - playerCenterY, ball.x - playerCenterX);
         ball.dx = Math.cos(newAngle) * ball.speed;
         ball.dy = Math.sin(newAngle) * ball.speed;
 
-        ball.increaseSpeed(1.1); // 공격에 의해 속도 10% 증가
-        ball.bounceCount = ball.initialBounceCount; // 바운스 횟수 초기화
-        ball.color = 'orange'; // 공 색상 초기화
+        ball.increaseSpeed(1.1); 
+        ball.bounceCount = ball.initialBounceCount; 
     }
 
     // 몹과 검의 충돌 감지
@@ -497,15 +484,14 @@ function drawSword() {
         );
 
         if (distanceToEnemy < enemy.width / 2) {
-            console.log("적 제거!");
-            enemies.splice(index, 1); // 적 제거
-            score += 10; // 점수 증가
+            enemies.splice(index, 1); 
+            score += 10; 
         }
     });
 
     attackFrame++;
     if (attackFrame > ATTACK_DURATION) {
-        isAttacking = false; // 공격 종료
+        isAttacking = false; 
     }
 }
 
@@ -520,17 +506,16 @@ function handlePlayerMovement() {
         if (keys['ArrowDown']) player.dy = PLAYER_SPEED;
         if (keys['ArrowLeft']) {
             player.dx = -PLAYER_SPEED;
-            currentPlayerImage = playerImageLeft; // 왼쪽으로 이동
+            currentPlayerImage = playerImageLeft; 
         }
         if (keys['ArrowRight']) {
             player.dx = PLAYER_SPEED;
-            currentPlayerImage = playerImageRight; // 오른쪽으로 이동
+            currentPlayerImage = playerImageRight;
         }
 
         player.x += player.dx;
         player.y += player.dy;
 
-        // 화면 경계 제한
         if (player.x < 0) player.x = 0;
         if (player.y < 0) player.y = 0;
         if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
@@ -540,78 +525,73 @@ function handlePlayerMovement() {
 
 // 적 생성
 function spawnEnemy() {
-    const scaleX = canvas.width / 1920; // 화면 크기에 따른 비율 조정
+    const scaleX = canvas.width / 1920; 
     const scaleY = canvas.height / 1080;
 
     let x, y;
-    let minDistance = 150 * Math.min(scaleX, scaleY); // 플레이어와 최소 거리
+    let minDistance = 500 * Math.min(scaleX, scaleY); 
 
     do {
         x = Math.random() * canvas.width;
         y = Math.random() * canvas.height;
 
-        // 플레이어와의 거리 계산
         const distX = x - (player.x + player.width / 2);
         const distY = y - (player.y + player.height / 2);
         const distance = Math.sqrt(distX ** 2 + distY ** 2);
 
-        // 거리가 충분히 떨어져 있으면 탈출
         if (distance >= minDistance) break;
 
     } while (true);
 
-    const isRanged = score >= 500 && Math.random() < 0.3; // 점수에 따라 원거리 적 생성 확률 증가
+    const isRanged = score >= 500 && Math.random() < 0.3;
 
     enemies.push({
         x,
         y,
-        width: ENEMY_BASE_SIZE * scaleX, // 화면 크기에 비례한 너비
-        height: ENEMY_BASE_SIZE * scaleY, // 화면 크기에 비례한 높이
+        width: ENEMY_BASE_SIZE * scaleX,
+        height: ENEMY_BASE_SIZE * scaleY, 
         dx: 0,
         dy: 0,
-        isRanged: isRanged, // 원거리 몹 여부
-        bullets: [], // 원거리 몹의 발사체
+        isRanged: isRanged, 
+        bullets: [], 
     
         draw() {
-            const image = this.dx < 0 ? enemyImageLeft : enemyImageRight; // 방향에 따라 이미지 선택
-            ctx.drawImage(image, this.x, this.y, this.width, this.height); // 이미지 그리기
+            const image = this.dx < 0 ? enemyImageLeft : enemyImageRight; 
+            ctx.drawImage(image, this.x, this.y, this.width, this.height); 
         },
     
         update() {
             const angle = Math.atan2(player.y - this.y, player.x - this.x);
-            this.dx = Math.cos(angle) * ENEMY_SPEED * scaleX; // 적 속도 비율 조정
+            this.dx = Math.cos(angle) * ENEMY_SPEED * scaleX; 
             this.dy = Math.sin(angle) * ENEMY_SPEED * scaleY;
     
             if (!this.isRanged) {
-                // 근접 몹 움직임
                 this.x += this.dx;
                 this.y += this.dy;
             } else {
-                // 원거리 몹 발사체 생성
-                if (Math.random() < 0.02) { // 발사체 생성 확률
+                if (Math.random() < 0.02) { 
                     this.bullets.push({
                         x: this.x + this.width / 2,
                         y: this.y + this.height / 2,
-                        dx: Math.cos(angle) * 5 * scaleX, // 발사체 속도
+                        dx: Math.cos(angle) * 5 * scaleX, 
                         dy: Math.sin(angle) * 5 * scaleY,
                         draw() {
                             ctx.fillStyle = 'yellow';
                             ctx.beginPath();
-                            ctx.arc(this.x, this.y, 5 * Math.min(scaleX, scaleY), 0, Math.PI * 2); // 발사체 크기 조정
+                            ctx.arc(this.x, this.y, 5 * Math.min(scaleX, scaleY), 0, Math.PI * 2); 
                             ctx.fill();
                         },
                         update() {
                             this.x += this.dx;
                             this.y += this.dy;
     
-                            // 발사체가 플레이어와 충돌하면 게임 종료
                             if (
                                 this.x > player.x &&
                                 this.x < player.x + player.width &&
                                 this.y > player.y &&
                                 this.y < player.y + player.height
                             ) {
-                                gameOver(); // 게임 종료 처리
+                                gameOver();
                             }
     
                             this.draw();
@@ -619,10 +599,8 @@ function spawnEnemy() {
                     });
                 }
     
-                // 원거리 몹의 발사체 업데이트
                 this.bullets = this.bullets.filter((bullet) => {
                     bullet.update();
-                    // 발사체가 화면 안에 있는지 확인
                     return (
                         bullet.x >= 0 &&
                         bullet.x <= canvas.width &&
@@ -638,14 +616,11 @@ function spawnEnemy() {
     
 }
 
-
-
-// 적 이동 및 그리기
 function updateEnemies() {
     enemies.forEach((enemy, index) => {
         enemy.update();
 
-        if (!isDashing) { // 대쉬 중에는 플레이어와의 충돌 판정 무시
+        if (!isDashing) { 
             const playerCenterX = player.x + player.width / 2;
             const playerCenterY = player.y + player.height / 2;
             const enemyCenterX = enemy.x + enemy.width / 2;
@@ -657,20 +632,16 @@ function updateEnemies() {
             );
 
             if (distance < (player.width / 2 + enemy.width / 2)) {
-                console.log("플레이어와 몬스터 충돌!");
-                gameOver(); // 충돌 시 게임 종료
-            }
+                gameOver();
         }
 
-        // 공과 몹 충돌 처리
         if (isBallCollidingWithEnemy(ball, enemy)) {
-            console.log("공이 몹과 충돌! 몹 제거");
-            enemies.splice(index, 1); // 몹 제거
-            score += 10; // 점수 증가
+            enemies.splice(index, 1); 
+            score += 10; 
         }
 
         enemy.draw();
-    });
+    }});
 }
 
 
@@ -685,39 +656,34 @@ function enforceAspectRatio() {
     let adjustedHeight = windowHeight;
 
     if (windowWidth / windowHeight > aspectRatio) {
-        // 가로가 너무 길면 세로 기준으로 맞추기
         adjustedWidth = windowHeight * aspectRatio;
     } else {
-        // 세로가 너무 길면 가로 기준으로 맞추기
         adjustedHeight = windowWidth / aspectRatio;
     }
 
     document.body.style.width = `${adjustedWidth}px`;
     document.body.style.height = `${adjustedHeight}px`;
 
-    // 캔버스 크기 업데이트
     const canvas = document.getElementById('gameCanvas');
     canvas.width = adjustedWidth;
     canvas.height = adjustedHeight;
 
 }
 
-// 초기 비율 설정 및 창 크기 변경 이벤트 연결
 window.addEventListener('load', enforceAspectRatio);
 window.addEventListener('resize', enforceAspectRatio);
 
 function drawBounces() {
-    const fontSize = canvas.height * 0.05; // 폰트 크기
-    const xPosition = canvas.width * 0.02; // X 위치
-    const yPosition = canvas.height * 0.24; // Y 위치
+    const fontSize = canvas.height * 0.05; 
+    const xPosition = canvas.width * 0.02; 
+    const yPosition = canvas.height * 0.24; 
 
     const text = `바운스: ${ball.bounceCount}`;
-    const textColor = ball.bounceCount <= 0 ? 'red' : 'white'; // 바운스 횟수에 따라 색상 변경
+    const textColor = ball.bounceCount <= 0 ? 'red' : 'white'; 
 
     ctx.font = `${fontSize}px Arial`;
-    ctx.fillStyle = textColor; // 텍스트 색상 설정
+    ctx.fillStyle = textColor; 
 
-    // 텍스트 그리기
     ctx.fillText(text, xPosition, yPosition);
 }
 
@@ -834,16 +800,15 @@ function drawScore() {
     ctx.font = `${fontSize}px Arial`;
     ctx.fillStyle = 'white';
 
-    // 텍스트 그리기
     ctx.fillStyle = 'white';
     ctx.fillText(text, xPosition, yPosition);
 }
 
 
 function drawHighScore(highScore) {
-    const fontSize = canvas.height * 0.05; // 폰트 크기
-    const xPosition = canvas.width * 0.02; // X 위치
-    const yPosition = canvas.height * 0.08; // Y 위치
+    const fontSize = canvas.height * 0.05; 
+    const xPosition = canvas.width * 0.02; 
+    const yPosition = canvas.height * 0.08; 
 
     const text = `최고 점수: ${highScore}`;
 
@@ -851,7 +816,6 @@ function drawHighScore(highScore) {
     ctx.fillStyle = 'white';
     ctx.fontWeight = 'bold';
 
-    // 텍스트 그리기
     ctx.fillStyle = 'white';
     ctx.fillText(text, xPosition, yPosition);
 }
@@ -859,9 +823,9 @@ function drawHighScore(highScore) {
 
 // 쿨타임 표시
 function drawCooldown() {
-    const fontSize = canvas.height * 0.04; // 폰트 크기
-    const xPosition = canvas.width * 0.02; // 텍스트 위치 (X)
-    const yPosition = canvas.height * 0.95; // 텍스트 위치 (Y)
+    const fontSize = canvas.height * 0.04; 
+    const xPosition = canvas.width * 0.02;
+    const yPosition = canvas.height * 0.95; 
     const text = canAttack
         ? '[스페이스] 공격 가능'
         : `쿨타임: ${(cooldownTimeLeft / 1000).toFixed(1)}s`;
@@ -874,8 +838,8 @@ function drawCooldown() {
     ctx.font = `${fontSize}px 'Arial Black', 'Arial Bold', Gadget, sans-serif`;
     const textWidth = ctx.measureText(text).width;
     const textHeight = fontSize;
-    const padding = 10; // 텍스트 박스 안쪽 여백
-    const borderRadius = 10; // 둥근 모서리 반지름
+    const padding = 10; 
+    const borderRadius = 10; 
 
     // 둥근 네모 박스 경로 생성
     const boxX = xPosition - padding;
@@ -884,22 +848,18 @@ function drawCooldown() {
     const boxHeight = textHeight + padding * 2;
 
     ctx.beginPath();
-    ctx.moveTo(boxX + borderRadius, boxY); // 시작점
-    ctx.lineTo(boxX + boxWidth - borderRadius, boxY); // 위쪽 라인
-    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + borderRadius); // 오른쪽 위 모서리
-    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - borderRadius); // 오른쪽 라인
-    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - borderRadius, boxY + boxHeight); // 오른쪽 아래 모서리
-    ctx.lineTo(boxX + borderRadius, boxY + boxHeight); // 아래쪽 라인
-    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - borderRadius); // 왼쪽 아래 모서리
-    ctx.lineTo(boxX, boxY + borderRadius); // 왼쪽 라인
-    ctx.quadraticCurveTo(boxX, boxY, boxX + borderRadius, boxY); // 왼쪽 위 모서리
+    ctx.moveTo(boxX + borderRadius, boxY); 
+    ctx.lineTo(boxX + boxWidth - borderRadius, boxY); 
+    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + borderRadius); 
+    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - borderRadius); 
+    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - borderRadius, boxY + boxHeight); 
+    ctx.lineTo(boxX + borderRadius, boxY + boxHeight); 
+    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - borderRadius); 
+    ctx.lineTo(boxX, boxY + borderRadius); 
+    ctx.quadraticCurveTo(boxX, boxY, boxX + borderRadius, boxY); 
     ctx.closePath();
-
-    // 둥근 네모 박스 채우기
     ctx.fillStyle = boxColor;
     ctx.fill();
-
-    // 텍스트 그리기
     ctx.fillStyle = textColor;
     ctx.fillText(text, xPosition, yPosition);
 }
@@ -916,7 +876,7 @@ function drawBackground() {
     if (backgroundImage.complete) {
         ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     } else {
-        ctx.fillStyle = 'black'; // 기본 배경 색상
+        ctx.fillStyle = 'black'; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 }
@@ -982,19 +942,18 @@ function gameOver() {
 //게임 초기화
 function resetGame() {
     score = 0;
-    player.resize(); // 플레이어 크기 설정
-    player.x = canvas.width / 2 - player.width / 2; // 초기 위치
-    player.y = canvas.height / 2 - player.height / 2; // 초기 위치
+    player.resize(); 
+    player.x = canvas.width / 2 - player.width / 2; 
+    player.y = canvas.height / 2 - player.height / 2; 
 
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
     ball.bounceCount = ball.initialBounceCount;
-    ball.color = 'orange';
 
-    ball.adjustRadius(); // 공 크기 동적 조정
-    ball.setRandomDirection(); // 공 방향과 속도 동적 설정
+    ball.adjustRadius();
+    ball.setRandomDirection(); 
 
-    enemies.length = 0; // 적 초기화
+    enemies.length = 0; 
     isAttacking = false;
     canAttack = true;
     cooldownTimeLeft = 0;
