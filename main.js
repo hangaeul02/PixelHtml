@@ -70,14 +70,12 @@ mainMenuButton.addEventListener('click', () => {
 window.addEventListener('keydown', (e) => {
     keys[e.key] = true;
 
-    // 공격 키 (스페이스바)
     if (e.key === ' ' && !isAttacking && canAttack) {
         const closestTarget = getClosestTarget();
         if (closestTarget) {
             isAttacking = true;
             attackFrame = 0;
 
-            // 공격 방향 설정
             if (closestTarget.type === 'enemy' || closestTarget.type === 'ball') {
                 const target = closestTarget.target;
                 attackAngle = Math.atan2(
@@ -409,13 +407,10 @@ const player = {
     }
 };
 
-
-// 가장 가까운 적 찾기
 function getClosestTarget() {
     let closestTarget = null;
     let minDistance = Infinity;
 
-    // 적들에 대한 거리 계산
     enemies.forEach((enemy) => {
         const distX = player.x + player.width / 2 - (enemy.x + enemy.width / 2);
         const distY = player.y + player.height / 2 - (enemy.y + enemy.height / 2);
@@ -427,7 +422,6 @@ function getClosestTarget() {
         }
     });
 
-    // 공에 대한 거리 계산
     const ballDistX = player.x + player.width / 2 - ball.x;
     const ballDistY = player.y + player.height / 2 - ball.y;
     const ballDistance = Math.sqrt(ballDistX ** 2 + ballDistY ** 2);
@@ -436,8 +430,9 @@ function getClosestTarget() {
         closestTarget = { type: 'ball', target: ball };
     }
 
-    return closestTarget;
+    return closestTarget; 
 }
+
 
 
 function drawSword() {
@@ -450,7 +445,6 @@ function drawSword() {
     const swordX = playerCenterX + Math.cos(angle) * SWORD_RANGE;
     const swordY = playerCenterY + Math.sin(angle) * SWORD_RANGE;
 
-    // 검 그리기
     ctx.beginPath();
     ctx.moveTo(playerCenterX, playerCenterY);
     ctx.lineTo(swordX, swordY);
@@ -458,7 +452,6 @@ function drawSword() {
     ctx.lineWidth = 5;
     ctx.stroke();
 
-    // 공과 검의 충돌 감지
     const distanceToBall = Math.sqrt(
         (ball.x - swordX) ** 2 +
         (ball.y - swordY) ** 2
@@ -473,7 +466,6 @@ function drawSword() {
         ball.bounceCount = ball.initialBounceCount; 
     }
 
-    // 몹과 검의 충돌 감지
     enemies.forEach((enemy, index) => {
         const enemyCenterX = enemy.x + enemy.width / 2;
         const enemyCenterY = enemy.y + enemy.height / 2;
