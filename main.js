@@ -280,7 +280,6 @@ const ball = {
     speed: Math.min(canvas.width, canvas.height) * 0.002, // 초기 속도
     image: new Image(), // 공 이미지
     color: 'orange',
-    lastBounceTime: 0, // 마지막으로 바운스 횟수가 줄어든 시간
 
     // 초기화 시 이미지 로드
     init() {
@@ -307,8 +306,6 @@ const ball = {
     },
 
     update() {
-        const currentTime = Date.now();
-
         // 이동
         this.x += this.dx;
         this.y += this.dy;
@@ -316,38 +313,49 @@ const ball = {
         // 벽 충돌 처리
         if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
             this.dx *= -1;
-            this.handleBounce(currentTime);
+            this.handleBounce();
         }
         if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
             this.dy *= -1;
-            this.handleBounce(currentTime);
+            this.handleBounce();
         }
 
         this.draw();
     },
 
-    handleBounce(currentTime) {
-        const minTimeBetweenBounces = 1000; // 1초
-        const isBouncingAllowed = currentTime - this.lastBounceTime >= minTimeBetweenBounces;
+    handleBounce() {
+        this.bounceCount -= 1;
 
-        if (isBouncingAllowed) {
-            // 바운스 횟수 감소 및 상태 업데이트
-            if (this.bounceCount > 0) {
-                this.bounceCount -= 1;
-                this.lastBounceTime = currentTime;
-            }
-
-            // 색상 변경
-            if (this.bounceCount > 0) {
-                this.color = 'orange';
-            } else if (this.bounceCount === 0) {
-                this.color = 'red';
-            }
+        if (this.bounceCount > 0) {
+            this.color = 'orange';
+        } else if (this.bounceCount <= 0) {
+            this.color = 'red';
         }
 
-        // 공이 벽에서 튕기는 소리를 추가하거나 속도 감소를 여기에서 처리 가능
+        // 벽에 튕길 때 속도 감소
+        this.speed *= 0.6; // 90%로 감소
+        this.updateVelocity();
+
+        if (this.bounceCount < 0) {
+            gameOver();
+        }
     },
 
+    setSpeed(newSpeed) {
+        this.speed = newSpeed;
+        this.updateVelocity();
+    },
+
+    increaseSpeed(factor) {
+        this.speed *= factor; // 속도 증가
+        this.updateVelocity();
+    },
+
+    updateVelocity() {
+        const angle = Math.atan2(this.dy, this.dx); // 현재 이동 방향의 각도
+        this.dx = Math.cos(angle) * this.speed; // x 방향 속도 재설정
+        this.dy = Math.sin(angle) * this.speed; // y 방향 속도 재설정
+    },
 
     adjustRadius() {
         this.radius = Math.min(canvas.width, canvas.height) * 0.07; // 캔버스 크기에 비례
@@ -361,6 +369,19 @@ const ball = {
 };
 
 ball.init();
+
+function isBallCollidingWithEnemy(ball, enemy) {
+    const nearestX = Math.max(enemy.x, Math.min(ball.x, enemy.x + enemy.width));
+    const nearestY = Math.max(enemy.y, Math.min(ball.y, enemy.y + enemy.height));
+    const deltaX = ball.x - nearestX;
+    const deltaY = ball.y - nearestY;
+
+    return (deltaX * deltaX + deltaY * deltaY) < (ball.radius * ball.radius);
+}
+
+
+
+
 
 // 플레이어
 const player = {
