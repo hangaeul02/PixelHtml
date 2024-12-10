@@ -21,10 +21,10 @@ const restartButton = document.getElementById('restartButton');
 const mainMenuButton = document.getElementById('mainMenuButton');
 
 startButton.addEventListener('click', () => {
-    document.getElementById('blackOverlay').style.display = 'block'; // 검은 배경 표시
-    uiContainer.style.display = 'none'; // 초기 화면 숨기기
-    canvas.style.display = 'block'; // 캔버스 표시
-    startGame(); // 게임 시작
+    document.getElementById('blackOverlay').style.display = 'block'; 
+    uiContainer.style.display = 'none'; 
+    canvas.style.display = 'block'; 
+    startGame(); 
 });
 
 
@@ -50,18 +50,18 @@ backFromSettings.addEventListener('click', () => {
 });
 
 restartButton.addEventListener('click', () => {
-    rankingsContainer.style.display = 'none'; // 게임 오버 창 숨기기
-    canvas.style.display = 'block'; // 캔버스 표시
-    resetGame(); // 게임 상태 초기화
-    startGame(); // 게임 재시작
+    rankingsContainer.style.display = 'none'; 
+    canvas.style.display = 'block'; 
+    resetGame(); 
+    startGame(); 
 });
 
 mainMenuButton.addEventListener('click', () => {
-    rankingsContainer.style.display = 'none'; // 게임 오버 창 숨기기
-    uiContainer.style.display = 'flex'; // 초기 UI 표시
-    canvas.style.display = 'none'; // 캔버스 숨기기
-    document.getElementById('blackOverlay').style.display = 'none'; // 덮개 숨기기
-    resetGame(); // 게임 상태 초기화
+    rankingsContainer.style.display = 'none'; 
+    uiContainer.style.display = 'flex'; 
+    canvas.style.display = 'none'; 
+    document.getElementById('blackOverlay').style.display = 'none'; 
+    resetGame(); 
 });
 
 
@@ -86,15 +86,14 @@ window.addEventListener('keydown', (e) => {
                 );
             }
 
-            canAttack = false; // 공격 쿨타임 적용
-            cooldownTimeLeft = ATTACK_COOLDOWN; // 쿨타임 초기화
+            canAttack = false; 
+            cooldownTimeLeft = ATTACK_COOLDOWN; 
 
-            // 공격 쿨타임 카운트다운
             const cooldownInterval = setInterval(() => {
-                cooldownTimeLeft -= 100; // 100ms씩 감소
+                cooldownTimeLeft -= 100; 
                 if (cooldownTimeLeft <= 0) {
                     clearInterval(cooldownInterval);
-                    canAttack = true; // 쿨타임 종료 후 다시 공격 가능
+                    canAttack = true; 
                 }
             }, 100);
         }
@@ -109,8 +108,8 @@ window.addEventListener('keyup', (e) => {
 // 키 입력 처리
 window.addEventListener('keydown', (e) => {
     if (e.key === 'z' && !isDashing && dashCooldownRemaining <= 0) {
-        startDash(); // 대쉬 실행
-        e.preventDefault(); // 기본 동작 방지
+        startDash(); 
+        e.preventDefault(); 
     }
 });
 
@@ -119,34 +118,34 @@ window.addEventListener('keydown', (e) => {
 
 document.getElementById('restartButton').addEventListener('click', () => {
     const rankingsContainer = document.getElementById('rankings');
-    rankingsContainer.style.display = 'none'; // 랭킹 화면 숨기기
-    menuButtons.style.display = 'block'; // 메인 메뉴 표시
+    rankingsContainer.style.display = 'none'; 
+    menuButtons.style.display = 'block'; 
 
-    resetGame(); // 게임 상태 초기화
+    resetGame(); 
 });
 
-let isDashing = false; // 대쉬 중인지 여부
-const DASH_SPEED = 6; // 대쉬 속도
-const DASH_DURATION = 500; // 대쉬 지속 시간 (밀리초)
-const DASH_COOLDOWN = 5000; // 대쉬 쿨타임 (밀리초)
-let dashCooldownRemaining = 0; // 남은 대쉬 쿨타임
+let isDashing = false; 
+const DASH_SPEED = 6; 
+const DASH_DURATION = 500; 
+const DASH_COOLDOWN = 5000; 
+let dashCooldownRemaining = 0; 
 
 const PLAYER_SPEED = 3;
 const ENEMY_SPEED = 2;
 const PLAYER_SIZE = 30;
 const ENEMY_SIZE = 20;
-const SWORD_RANGE = 60; // 검의 길이
-const ATTACK_DURATION = 10; // 공격 애니메이션 지속 프레임
-const ATTACK_COOLDOWN = 1500; // 공격 쿨타임
-const enemies = []; // 적 리스트
-const keys = {}; // 키 입력 상태 추적 객체
-// 몹 이미지 로드
+const SWORD_RANGE = 60;
+const ATTACK_DURATION = 10; 
+const ATTACK_COOLDOWN = 1500; 
+const enemies = [];
+const keys = {}; 
+
 const enemyImageLeft = new Image();
-enemyImageLeft.src = '몹L.png'; // 왼쪽 방향 이미지
+enemyImageLeft.src = '몹L.png'; 
 
 const enemyImageRight = new Image();
-enemyImageRight.src = '몹R.png'; // 오른쪽 방향 이미지
-const ENEMY_BASE_SIZE = 100; // 몹 기본 크기 (기존보다 키움)
+enemyImageRight.src = '몹R.png'; 
+const ENEMY_BASE_SIZE = 100; 
 
 // 플레이어 이미지 로드
 const playerImageLeft = new Image();
@@ -162,20 +161,20 @@ const slidingImageRight = new Image();
 slidingImageRight.src = '슬라이딩R.png';
 
 // 현재 플레이어 이미지
-let currentPlayerImage = playerImageRight; // 기본적으로 오른쪽을 바라보는 이미지
+let currentPlayerImage = playerImageRight; 
 
 const ballImage = new Image();
 ballImage.src = '공 이미지.png';
 
 let score = 0;
-let isAttacking = false; // 공격 상태
-let attackFrame = 0; // 현재 공격 애니메이션 프레임
-let attackAngle = 0; // 검의 휘두르기 각도
-let canAttack = true; // 공격 가능 여부
-let cooldownTimeLeft = 0; // 남은 쿨타임
-let gameRunning = false; // 게임 상태 관리
-let scoreInterval; // 점수 증가 Interval ID
-let gameLoopId; // 애니메이션 루프 ID 저장
+let isAttacking = false; 
+let attackFrame = 0; 
+let attackAngle = 0; 
+let canAttack = true; 
+let cooldownTimeLeft = 0; 
+let gameRunning = false; 
+let scoreInterval; 
+let gameLoopId; 
 
 function resizeCanvas() {
     const aspectRatio = 16 / 9;
@@ -192,12 +191,10 @@ function resizeCanvas() {
     canvas.style.height = `${height}px`;
     canvas.width = width;
     canvas.height = height;
-
-    // 공과 플레이어 크기 동적으로 조정
     ball.adjustRadius();
     player.resize();
 
-    drawBackground(); // 배경 다시 그리기
+    drawBackground(); 
 }
 
 
@@ -225,11 +222,11 @@ function adjustUI() {
     const uiContainer = document.getElementById('uiContainer');
 
     if (gameRunning) {
-        uiContainer.style.display = 'none'; // 게임 중 UI 숨기기
+        uiContainer.style.display = 'none'; 
     } else {
-        uiContainer.style.display = 'flex'; // 메인 메뉴 또는 게임 종료 시 표시
-        uiContainer.style.width = `${canvas.width * 0.4}px`; // 동적 너비
-        uiContainer.style.padding = `${canvas.width * 0.02}px`; // 동적 패딩
+        uiContainer.style.display = 'flex'; 
+        uiContainer.style.width = `${canvas.width * 0.4}px`; 
+        uiContainer.style.padding = `${canvas.width * 0.02}px`; 
     }
 }
 
@@ -248,22 +245,22 @@ function adjustGameOverUI() {
     const scaleFactor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
 
     // 게임 오버 창 스타일 동적 조정
-    rankingsContainer.style.width = `${Math.max(400, scaleFactor * 800)}px`; // 최소 400px, 최대 800px
-    rankingsContainer.style.padding = `${scaleFactor * 20}px`; // 패딩 비율 조정
-    rankingsContainer.style.borderRadius = `${scaleFactor * 10}px`; // 둥근 모서리 비율 조정
+    rankingsContainer.style.width = `${Math.max(400, scaleFactor * 800)}px`; 
+    rankingsContainer.style.padding = `${scaleFactor * 20}px`; 
+    rankingsContainer.style.borderRadius = `${scaleFactor * 10}px`; 
 
     // 제목과 점수 텍스트 크기 동적 조정
     const gameOverTitle = rankingsContainer.querySelector('h2');
     const finalScoreText = rankingsContainer.querySelector('h3:first-of-type');
     const highScoreText = rankingsContainer.querySelector('h3:nth-of-type(2)');
 
-    gameOverTitle.style.fontSize = `${Math.max(20, scaleFactor * 36)}px`; // 최소 20px, 비율에 따른 크기
-    finalScoreText.style.fontSize = `${Math.max(18, scaleFactor * 28)}px`; // 최소 18px, 비율에 따른 크기
-    highScoreText.style.fontSize = `${Math.max(16, scaleFactor * 24)}px`; // 최소 16px, 비율에 따른 크기
+    gameOverTitle.style.fontSize = `${Math.max(20, scaleFactor * 36)}px`; 
+    finalScoreText.style.fontSize = `${Math.max(18, scaleFactor * 28)}px`; 
+    highScoreText.style.fontSize = `${Math.max(16, scaleFactor * 24)}px`; 
 
     // 점수 목록 크기 조정
     const rankingList = rankingsContainer.querySelector('#rankingList');
-    rankingList.style.fontSize = `${Math.max(14, scaleFactor * 20)}px`; // 최소 14px
+    rankingList.style.fontSize = `${Math.max(14, scaleFactor * 20)}px`; 
 }
 
 
@@ -272,18 +269,17 @@ function adjustGameOverUI() {
 const ball = {
     x: canvas.width * 0.5,
     y: canvas.height * 0.5,
-    radius: Math.min(canvas.width, canvas.height) * 0.03, // 초기 반지름
-    dx: 0, // 초기 x 방향 속도
-    dy: 0, // 초기 y 방향 속도
-    initialBounceCount: 2, // 초기 바운스 횟수
-    bounceCount: 2, // 벽에서 튕길 수 있는 남은 횟수
-    speed: Math.min(canvas.width, canvas.height) * 0.002, // 초기 속도
-    image: new Image(), // 공 이미지
+    radius: Math.min(canvas.width, canvas.height) * 0.03, 
+    dx: 0, 
+    dy: 0, 
+    initialBounceCount: 2, 
+    bounceCount: 2, 
+    speed: Math.min(canvas.width, canvas.height) * 0.002, 
+    image: new Image(),
     color: 'orange',
 
-    // 초기화 시 이미지 로드
     init() {
-        this.image.src = '공 이미지.png'; // 공 이미지 경로
+        this.image.src = '공 이미지.png';
     },
 
     draw() {
@@ -296,7 +292,6 @@ const ball = {
                 this.radius * 2
             );
         } else {
-            // 이미지가 로드되지 않았을 경우 기본 색상으로 원 그리기
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
@@ -306,11 +301,9 @@ const ball = {
     },
 
     update() {
-        // 이동
         this.x += this.dx;
         this.y += this.dy;
 
-        // 벽 충돌 처리
         if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
             this.dx *= -1;
             this.handleBounce();
@@ -333,7 +326,7 @@ const ball = {
         }
 
         // 벽에 튕길 때 속도 감소
-        this.speed *= 0.6; // 90%로 감소
+        this.speed *= 0.6; 
         this.updateVelocity();
 
         if (this.bounceCount < 0) {
@@ -347,18 +340,18 @@ const ball = {
     },
 
     increaseSpeed(factor) {
-        this.speed *= factor; // 속도 증가
+        this.speed *= factor;
         this.updateVelocity();
     },
 
     updateVelocity() {
-        const angle = Math.atan2(this.dy, this.dx); // 현재 이동 방향의 각도
+        const angle = Math.atan2(this.dy, this.dx); 
         this.dx = Math.cos(angle) * this.speed; // x 방향 속도 재설정
         this.dy = Math.sin(angle) * this.speed; // y 방향 속도 재설정
     },
 
     adjustRadius() {
-        this.radius = Math.min(canvas.width, canvas.height) * 0.07; // 캔버스 크기에 비례
+        this.radius = Math.min(canvas.width, canvas.height) * 0.07; 
     },
 
     setRandomDirection() {
