@@ -317,22 +317,25 @@ const ball = {
     },
 
     handleBounce() {
-        this.bounceCount -= 1;
-
+        console.log(`바운스 횟수 감소: ${this.bounceCount - 1}`); 
+    
+        this.bounceCount = Math.max(this.bounceCount - 1, 0); 
+        console.log(`바운스 횟수 제한 후: ${this.bounceCount}`); 
+    
         if (this.bounceCount > 0) {
             this.color = 'orange';
-        } else if (this.bounceCount <= 0) {
+        } else {
             this.color = 'red';
         }
-
-        // 벽에 튕길 때 속도 감소
+    
         this.speed *= 0.6; 
         this.updateVelocity();
-
-        if (this.bounceCount < 0) {
+    
+        if (this.bounceCount <= 0) {
             gameOver();
         }
     },
+    
 
     setSpeed(newSpeed) {
         this.speed = newSpeed;
@@ -782,7 +785,7 @@ function drawDashCooldown() {
     const yPosition = canvas.height * 0.85; 
     const text = dashCooldownRemaining > 0
         ? `쿨타임: ${(dashCooldownRemaining / 1000).toFixed(1)}s`
-        : '대쉬 가능';
+        : '[Z] 대쉬 가능';
 
     const boxColor = dashCooldownRemaining > 0 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)';
     const textColor = 'white';
@@ -860,7 +863,7 @@ function drawCooldown() {
     const xPosition = canvas.width * 0.02; // 텍스트 위치 (X)
     const yPosition = canvas.height * 0.95; // 텍스트 위치 (Y)
     const text = canAttack
-        ? '공격 가능'
+        ? '[스페이스] 공격 가능'
         : `쿨타임: ${(cooldownTimeLeft / 1000).toFixed(1)}s`;
 
     // 텍스트 박스 색상 설정
