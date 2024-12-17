@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BounceQuest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="uiContainer">
+        <h1 id="title" class="gameTitle">Bounce<span class="highlight">Quest</span></h1>
+        <div id="menuButtons">
+            <button id="startButton" class="menuButton">게임 시작</button>
+            <button id="instructionsButton" class="menuButton">게임 설명</button>
+            <button id="settingsButton" class="menuButton">랭킹</button>
+        </div>
+        <div id="instructions" class="popup">
+            <div class="instructions-header">
+                <h2 id="instructionsTitle">게임 개요</h2>
+            </div>
+            <div id="instructionsContent" class="instructions-content">
+                <p id="instructionsText">
+                    <strong>BounceQuest</strong>는 빠른 판단력과 반사 신경을 요구하는 <strong>아케이드 액션 게임</strong>입니다.  
+                    공의 바운스 횟수를 유지하며 적을 물리치고 최고의 점수를 획득하세요!
+                </p>
+                <div class="image-container">
+                    <img id="instructionsImage" src="game_icon.png" alt="Game Overview">
+                </div>
+            </div>
+            <div class="instructions-footer">
+                <button id="prevPage" class="navButton" disabled>⟨ 이전</button>
+                <span id="pageIndicator">1 / 7</span>
+                <button id="nextPage" class="navButton">다음 ⟩</button>
+            </div>
+            <button id="backFromInstructions" class="backButton">메인 메뉴로 돌아가기</button>
+        </div>        
+        <div id="settings" class="popup">
+            <div id="rankingHeader">
+                <h2 id="rankingTitle">[전체 랭킹]</h2>
+            </div>
+            <div id="rankingContainer">
+                <ul id="rankingList" style="list-style: none; padding: 0; text-align: left;"></ul>
+            </div>
+            <button id="backFromSettings" class="backButton">뒤로</button>
+        </div>
+    </div>
+    <div id="blackOverlay"></div>
+    <div id="gameOverContainer" class="game-over">
+        <div class="game-over-content">
+            <h2 class="game-over-title">Game Over</h2>
+            <p class="game-over-score">당신의 점수: <span id="finalScore">0</span></p>
+            <p class="game-over-highscore">최고 점수: <span id="highScoreDisplay">0</span></p>
+            <div class="game-over-buttons">
+                <button id="restartButton" class="game-over-button">다시 시작</button>
+                <button id="mainMenuButton" class="game-over-button">메인 메뉴</button>
+            </div>
+        </div>
+    </div>    
+    <canvas id="gameCanvas"></canvas>
+    <script src="main.js"></script>
+</body>
+</html>
